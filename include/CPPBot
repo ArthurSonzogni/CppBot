@@ -13,6 +13,7 @@ class CPPBot
 
         // mouse
         void mousePosition(const int x, const int y);
+        void mouseGetPosition(int& x, int& y);
         void mousePress(const int button);
         void mouseRelease(const int button);
         void mouse(const int button);

@@ -11,6 +11,9 @@ project(test)
 # └──────────────────────────────────────────────────────────────────┘
 if(UNIX)
     set(LIB_DIR lib/linux)
+    find_package(X11 REQUIRED)
+    set(NEEDED_LIBS     "${NEEDED_LIBS}${X11_LIBRARIES}"  )
+    set(NEEDED_INCLUDES "${NEEDED_INCLUDES} ${X11_INCLUDE_DIR}")
 elseif(WIN32)
     set(LIB_DIR lib/windows)
 elseif(APPLE)
@@ -20,15 +23,14 @@ else()
 endif()
 
 file(GLOB_RECURSE libs ${LIB_DIR}/*.cpp)
-add_library (CppBot ${libs})
-target_include_directories(CppBot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library (CPPBot ${libs})
+target_include_directories(CPPBot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ┌──────────────────────────────────────────────────────────────────┐
 # │  Install library                                                 |
 # └──────────────────────────────────────────────────────────────────┘
 
-
-INSTALL(TARGETS CppBot
+INSTALL(TARGETS CPPBot
     DESTINATION "lib"
 )
 
@@ -42,7 +44,8 @@ INSTALL(FILES include/CPPBot
 
 include_directories(include)
 add_executable(test test/test.cpp)
-target_link_libraries (test LINK_PUBLIC CppBot)
+target_link_libraries (test LINK_PUBLIC CPPBot ${NEEDED_LIBS})
+include_directories(${NEEDED_INCLUDES})
 
 # ┌──────────────────────────────────────────────────────────────────┐
 # │  make run (command)                                              │ 
