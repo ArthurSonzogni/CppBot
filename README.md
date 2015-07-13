@@ -13,8 +13,9 @@ Features :
 
 Work in progress
 ================
-|Feature  | Linux | Windows | Mac |
-|-----    | ----- | --------| --  |
-|keyboard | 100%  | 0%      | 0%  |
-|Mouse    | 100%  | 0%      | 0%  |
-|Screen   | 100%  | 0%      | 0%  |
+
+| Feature  | Linux | Windows | Mac |
+| -------- | ----- | --------| --- |
+| keyboard | 100%  | 0%      | 0%  |
+| Mouse    | 100%  | 0%      | 0%  |
+| Screen   | 100%  | 0%      | 0%  |
