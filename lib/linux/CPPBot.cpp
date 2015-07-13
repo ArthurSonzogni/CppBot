@@ -1,24 +1,39 @@
 #include "CPPBot"
-#include <iostream>
 #include <X11/Xlib.h>
-#include <X11/keysym.h>
+#include <X11/Xutil.h>
+#include <cstring> // memset
+#include <iostream>
 
-Display* display;
+
+// data for the linux implementation
+static int CPPBotElements = 0;
+static Display* display = NULL;
+static unsigned char* pixels = NULL;
+static int width = 0;
+static int height = 0;
+
 
 CPPBot::CPPBot()
 {
-    display = XOpenDisplay(0); 
+    if (!CPPBotElements)
+        display = XOpenDisplay(0); 
+    CPPBotElements++;
 }
 
 CPPBot::~CPPBot()
 {
-    XCloseDisplay(display);
+    CPPBotElements--;
+    if (!CPPBotElements)
+    {
+        XCloseDisplay(display);
+        if (pixels) delete pixels;
+        pixels = NULL;
+    }
 }
 
 // ┌──────────────────────────────────────────────────────────────────┐
 // │  Keyboard                                                        |
 // └──────────────────────────────────────────────────────────────────┘
-
 
 void keyboardEvent(bool pressed,int key)
 {
@@ -43,11 +58,7 @@ void keyboardEvent(bool pressed,int key)
     event.same_screen = True;
     event.keycode     = XKeysymToKeycode(display, key);
     event.state       = 0;//modifiers;
-
-    if (pressed)
-        event.type = KeyPress;
-    else
-        event.type = KeyRelease;
+    event.type = pressed? KeyPress : KeyRelease;
     XSendEvent(event.display, event.window, True, KeyPressMask, (XEvent *)&event);
 
 }
@@ -73,11 +84,14 @@ void CPPBot::keyboard(const int key)
 
 void CPPBot::mousePosition(const int x, const int y)
 {
-    std::cout << "Sorry : CPPBot: mousePosition is not implemented" << std::endl;
+    int mouse_x, mouse_y;
+    mouseGetPosition(mouse_x,mouse_y);
+
+    XWarpPointer (display, None, None, 0,0,0,0, x-mouse_x, y-mouse_y);
+    XFlush (display);
 }
 void CPPBot::mouseGetPosition(int& x, int& y)
 {
-
     XEvent event;
     XQueryPointer (display, DefaultRootWindow (display),
             &event.xbutton.root, &event.xbutton.window,
@@ -86,15 +100,41 @@ void CPPBot::mouseGetPosition(int& x, int& y)
             &event.xbutton.state);
     x = event.xbutton.x;
     y = event.xbutton.y;
+}
 
+void mouseEvent(bool pressed, const int button)
+{
+    // Create and setting up the event
+    XEvent event;
+    memset(&event, 0, sizeof (event));
+    event.xbutton.button = 
+         (button == CPPBot::LEFT  ) ? Button1
+        :(button == CPPBot::MIDDLE) ? Button2
+        :(button == CPPBot::RIGHT ) ? Button3
+        : 0;
+    event.xbutton.same_screen = True;
+    event.xbutton.subwindow = DefaultRootWindow (display);
+    while (event.xbutton.subwindow)
+    {
+        event.xbutton.window = event.xbutton.subwindow;
+        XQueryPointer (display, event.xbutton.window,
+                &event.xbutton.root, &event.xbutton.subwindow,
+                &event.xbutton.x_root, &event.xbutton.y_root,
+                &event.xbutton.x, &event.xbutton.y,
+                &event.xbutton.state);
+    }
+    event.type = pressed ? ButtonPress : ButtonRelease;
+
+    XSendEvent (display, PointerWindow, True, ButtonPressMask, &event);
+    XFlush (display);
 }
 void CPPBot::mousePress(const int button)
 {
-    std::cout << "Sorry : CPPBot: mousePress is not implemented" << std::endl;
+    mouseEvent(true,button);
 }
 void CPPBot::mouseRelease(const int button)
 {
-    std::cout << "Sorry : CPPBot: mouseRelease is not implemented" << std::endl;
+    mouseEvent(false,button);
 }
 void CPPBot::mouse(const int button)
 {
@@ -105,15 +145,59 @@ void CPPBot::mouse(const int button)
 // ┌──────────────────────────────────────────────────────────────────┐
 // │  Screen                                                          |
 // └──────────────────────────────────────────────────────────────────┘
-const char* CPPBot::screen()
+const unsigned char* CPPBot::screen()
 {
-    std::cout << "Sorry : CPPBot: screen is not implemented" << std::endl;
+    XWindowAttributes gwa;
+    Window root = DefaultRootWindow(display);
+    XGetWindowAttributes(display, root , &gwa);
+
+    // allo
+    if (gwa.width != width || gwa.height != height || !pixels)
+    {
+        if (pixels) delete pixels;
+        width = gwa.width;
+        height = gwa.height;
+        pixels = new unsigned char[width * height * 3];
+    }
+
+    XImage *image = XGetImage(display,root, 0,0 , width,height,AllPlanes, ZPixmap);
+
+    unsigned long red_mask   = image->red_mask;
+    unsigned long green_mask = image->green_mask;
+    unsigned long blue_mask  = image->blue_mask;
+
+    unsigned char* i = pixels;
+    for (int y = 0; y < height ; y++)
+    for (int x = 0; x < width; x++)
+    {
+        
+        unsigned long pixel = XGetPixel(image,x,y);
+
+        unsigned char blue  = pixel & blue_mask;
+        unsigned char green = (pixel & green_mask) >> 8;
+        unsigned char red   = (pixel & red_mask) >> 16;
+
+        *(i++) = red;
+        *(i++) = green;
+        *(i++) = blue;
+    }
+
+    return pixels;
+
 }
 const int CPPBot::screenWidth()
 {
-    std::cout << "Sorry : CPPBot: screenWidth is not implemented" << std::endl;
+    XWindowAttributes gwa;
+
+    XGetWindowAttributes(display, DefaultRootWindow(display), &gwa);
+    int width = gwa.width;
+    return gwa.width;;
 }
 const int CPPBot::screenHeight()
 {
-    std::cout << "Sorry : CPPBot: screenHeight is not implemented" << std::endl;
+    XWindowAttributes gwa;
+
+    XGetWindowAttributes(display, DefaultRootWindow(display), &gwa);
+    int height = gwa.height;
+    return gwa.height;;
 }

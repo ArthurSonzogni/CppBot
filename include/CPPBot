@@ -19,7 +19,7 @@ class CPPBot
         void mouse(const int button);
         
         // screen
-        const char* screen();
+        const unsigned char* screen();
         const int screenWidth();
         const int screenHeight();
 

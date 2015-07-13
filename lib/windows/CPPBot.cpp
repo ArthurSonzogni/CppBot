@@ -57,7 +57,7 @@ void CPPBot::mouse(const int button)
 // ┌──────────────────────────────────────────────────────────────────┐
 // │  Screen                                                          |
 // └──────────────────────────────────────────────────────────────────┘
-const char* CPPBot::screen()
+const unsigned char* CPPBot::screen()
 {
     std::cout << "Sorry : CPPBot: screen is not implemented" << std::endl;
 }

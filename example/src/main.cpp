@@ -19,7 +19,7 @@ int main(int argc, const char *argv[])
     }
     else if (c == 3) // screen
     {
-        const char* s = bot.screen();
+        const unsigned char* s = bot.screen();
         std::cout << "screen width = " << bot.screenWidth() << std::endl;
         std::cout << "screen height = " << bot.screenHeight() << std::endl;
     }
