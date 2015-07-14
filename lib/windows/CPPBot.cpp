@@ -9,6 +9,7 @@
 
 // data for the windows implementation
 static std::vector<unsigned char> pixels;
+static std::vector<unsigned char> convertedPixels;
 
 CPPBot::CPPBot()
 {
@@ -77,6 +78,19 @@ void CPPBot::mouse(const int button)
 // ┌──────────────────────────────────────────────────────────────────┐
 // │  Screen                                                          │
 // └──────────────────────────────────────────────────────────────────┘
+void convertScreenPixel()
+{
+    // making an horizontal flip.
+    // convert from ABGR -> BGR
+    convertedPixels.resize(pixels.size() * 3 / 4);
+    int j = 0;
+    for(int i = pixels.size(); i>0; --i)
+    {
+        convertedPixels[++j] = pixels[--i]; //R
+        convertedPixels[++j] = pixels[--i]; //G
+        convertedPixels[++j] = pixels[--i]; //B
+    }
+}
 const unsigned char* CPPBot::screen()
 {
     int width = GetSystemMetrics(SM_CXSCREEN);
@@ -113,7 +127,8 @@ const unsigned char* CPPBot::screen()
     DeleteObject(hBmp);
     DeleteDC(hDc);
 
-    return pixels.data();
+    convertScreenPixel();
+    return convertedPixels.data();
 }
 const int CPPBot::screenWidth()
 {

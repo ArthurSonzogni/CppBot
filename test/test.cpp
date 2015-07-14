@@ -35,9 +35,9 @@ int main(int argc, const char *argv[])
         for(int y = 0; y<height; ++y)
             for(int x = 0; x<width; ++x)
             {
-                int red   = screen[0 + 4 * ( x + width * y)];
-                int green = screen[1 + 4 * ( x + width * y)];
-                int blue  = screen[2 + 4 * ( x + width * y)];
+                int red   = screen[0 + 3 * ( x + width * y)];
+                int green = screen[1 + 3 * ( x + width * y)];
+                int blue  = screen[2 + 3 * ( x + width * y)];
                 int value = red+green+blue;
                 if (value>best)
                 {
@@ -50,7 +50,7 @@ int main(int argc, const char *argv[])
         std::cout << "x = " << bestX << std::endl;
         std::cout << "y = " << bestY << std::endl;
         std::ofstream output("output.raw",std::ios::binary);
-        output.write((char*)screen, 4*width*height);
+        output.write((char*)screen, 3*width*height);
     }
 
     std::cout << "width = " << width << std::endl;
