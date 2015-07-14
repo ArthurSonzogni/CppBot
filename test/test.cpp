@@ -19,6 +19,12 @@ int main(int argc, const char *argv[])
     bot.keyboard('u');
     bot.keyboard('r');
 
+    for(int i = 0; i<1000; ++i)
+    {
+        std::cout << "i=" << i << std::endl;
+        for(int i = 0; i<30; ++i)
+        bot.screen();
+    }
 
     const int width = bot.screenWidth();
     const int height = bot.screenHeight();

@@ -78,17 +78,25 @@ void CPPBot::mouse(const int button)
 // ┌──────────────────────────────────────────────────────────────────┐
 // │  Screen                                                          │
 // └──────────────────────────────────────────────────────────────────┘
-void convertScreenPixel()
+void convertScreenPixel(int width, int height)
 {
     // making an horizontal flip.
     // convert from ABGR -> BGR
     convertedPixels.resize(pixels.size() * 3 / 4);
-    int j = 0;
-    for(int i = pixels.size(); i>0; --i)
+
+    int i = 0;
+
+    for(int y = height-1; y>=0; --y) // flip horizontally
     {
-        convertedPixels[++j] = pixels[--i]; //R
-        convertedPixels[++j] = pixels[--i]; //G
-        convertedPixels[++j] = pixels[--i]; //B
+        unsigned char * row = pixels.data() + width * y * 4;
+        for(int x = 0; x<width; ++x)
+        {
+            convertedPixels[i+2] = *(row++); // B
+            convertedPixels[i+1] = *(row++); // G
+            convertedPixels[i+0] = *(row++); // R
+            row+=1; // A
+            i+=3;
+        }
     }
 }
 const unsigned char* CPPBot::screen()
@@ -127,7 +135,7 @@ const unsigned char* CPPBot::screen()
     DeleteObject(hBmp);
     DeleteDC(hDc);
 
-    convertScreenPixel();
+    convertScreenPixel(width,height);
     return convertedPixels.data();
 }
 const int CPPBot::screenWidth()
