@@ -1,15 +1,35 @@
 #include "CPPBot"
+#include <iostream>
+#include <windows.h>
+#include <Winuser.h>
+#include <vector>
+#include <cstdlib>
+#include <cstring>
+
+
+// data for the windows implementation
+static std::vector<unsigned char> pixels;
 
 CPPBot::CPPBot()
 {
+    // make our application DPIres aware
+    // if we didn't do that windows report wrong screen dimensions.
+    // Why can't I get theses informations easily on windows ?
+    HMODULE hUser32 = LoadLibrary("user32.dll");
+    typedef BOOL (*SetProcessDPIAwareFunc)();
+    SetProcessDPIAwareFunc setDPIAware = (SetProcessDPIAwareFunc)GetProcAddress(hUser32, "SetProcessDPIAware");
+    if (setDPIAware)
+        setDPIAware();
+    FreeLibrary(hUser32);
 }
 
 CPPBot::~CPPBot()
 {
+    pixels.clear();
 }
 
 // ┌──────────────────────────────────────────────────────────────────┐
-// │  Keyboard                                                        |
+// │  Keyboard                                                        │
 // └──────────────────────────────────────────────────────────────────┘
 
 void CPPBot::keyboardPress(const int key)
@@ -29,7 +49,7 @@ void CPPBot::keyboard(const int key)
 }
 
 // ┌──────────────────────────────────────────────────────────────────┐
-// │  Mouse                                                           |
+// │  Mouse                                                           │
 // └──────────────────────────────────────────────────────────────────┘
 void CPPBot::mousePosition(const int x, const int y)
 {
@@ -55,17 +75,51 @@ void CPPBot::mouse(const int button)
 
 
 // ┌──────────────────────────────────────────────────────────────────┐
-// │  Screen                                                          |
+// │  Screen                                                          │
 // └──────────────────────────────────────────────────────────────────┘
 const unsigned char* CPPBot::screen()
 {
-    std::cout << "Sorry : CPPBot: screen is not implemented" << std::endl;
+    int width = GetSystemMetrics(SM_CXSCREEN);
+    int height = GetSystemMetrics(SM_CYSCREEN);
+
+    // create DC
+    HDC hDc = CreateCompatibleDC(0);
+    // create hBitmap
+    HBITMAP hBmp = CreateCompatibleBitmap(GetDC(0), width, height);
+
+    // transfert from DC to hBitmap
+    SelectObject(hDc, hBmp);
+    BitBlt(hDc, 0, 0, width, height, GetDC(0), 0, 0, SRCCOPY);
+
+    // get raw byte from hBitmap
+    BITMAP Bmp = {0};
+    BITMAPINFO Info = {0};
+    std::memset(&Info, 0, sizeof(BITMAPINFO)); //not necessary really..
+    GetObject(hBmp, sizeof(Bmp), &Bmp);
+
+    Info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    Info.bmiHeader.biWidth = width = Bmp.bmWidth;
+    Info.bmiHeader.biHeight = height = Bmp.bmHeight;
+    Info.bmiHeader.biPlanes = 1;
+    Info.bmiHeader.biBitCount = Bmp.bmBitsPixel;
+    Info.bmiHeader.biCompression = BI_RGB;
+    Info.bmiHeader.biSizeImage = ((width * Bmp.bmBitsPixel + 31) / 32) * 4 * height;
+
+
+    pixels.resize(Info.bmiHeader.biSizeImage);
+    GetDIBits(hDc, hBmp, 0, height, pixels.data(), &Info, DIB_RGB_COLORS);
+
+    DeleteObject(&Bmp);
+    DeleteObject(hBmp);
+    DeleteDC(hDc);
+
+    return pixels.data();
 }
 const int CPPBot::screenWidth()
 {
-    std::cout << "Sorry : CPPBot: screenWidth is not implemented" << std::endl;
+    return GetSystemMetrics(SM_CXSCREEN);
 }
 const int CPPBot::screenHeight()
 {
-    std::cout << "Sorry : CPPBot: screenHeight is not implemented" << std::endl;
+    return GetSystemMetrics(SM_CYSCREEN);
 }
