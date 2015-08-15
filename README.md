@@ -1,7 +1,7 @@
 C++Bot
 ======
 
-Tools for creating your bot.
+Tools for creating your bot in **C++**.
 
 Features : 
 =========
@@ -19,3 +19,9 @@ Work in progress
 | keyboard | 100%  | 100%    | 0%  |
 | Mouse    | 100%  | 100%    | 0%  |
 | Screen   | 100%  | 100%    | 0%  |
+
+Contribution
+============
+
+I am open to contributions, especialy the MacOS implementation, bug fixes, performances improvements and API suggestions. Thanks you !
+I hope it could be useful.
