@@ -23,5 +23,7 @@ Work in progress
 Contribution
 ============
 
-I am open to contributions, especialy the MacOS implementation, bug fixes, performances improvements and API suggestions. Thanks you !
+I am open to contributions, especialy the MacOS implementation, bug fixes, performances improvements and API suggestions.
+Thanks you !
+
 I hope it could be useful.
