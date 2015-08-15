@@ -10,6 +10,11 @@
 // data for the windows implementation
 static std::vector<unsigned char> pixels;
 static std::vector<unsigned char> convertedPixels;
+static int screenWidthCached = 0;
+static int screenHeightCached = 0;
+bool isInitialized = false;
+static const DWORD mouseButtonDown[3] = {MOUSEEVENTF_LEFTDOWN,MOUSEEVENTF_MIDDLEDOWN,MOUSEEVENTF_RIGHTDOWN};
+static const DWORD mouseButtonUp[3]   = {MOUSEEVENTF_LEFTUP,  MOUSEEVENTF_MIDDLEUP,  MOUSEEVENTF_RIGHTUP};
 
 CPPBot::CPPBot()
 {
@@ -22,6 +27,13 @@ CPPBot::CPPBot()
     if (setDPIAware)
         setDPIAware();
     FreeLibrary(hUser32);
+
+    if (!isInitialized)
+    {
+        isInitialized = true;
+        screenWidthCached = screenWidth();
+        screenHeightCached = screenHeight();
+    }
 }
 
 CPPBot::~CPPBot()
@@ -35,12 +47,27 @@ CPPBot::~CPPBot()
 
 void CPPBot::keyboardPress(const int key)
 {
-    std::cout << "Sorry : CPPBot::keyboardPress is not implemented" << std::endl;
+    INPUT input;
+    input.type = INPUT_KEYBOARD;
+    input.ki.wScan = 0;
+    input.ki.time = 0;
+    input.ki.dwExtraInfo = 0;
+    input.ki.wVk = key+0x41-'a';
+    input.ki.dwFlags = 0;
+    SendInput(1, &input, sizeof(INPUT));
+    std::cout << key << std::endl;
 }
 
 void CPPBot::keyboardRelease(const int key)
 {
-    std::cout << "Sorry : CPPBot::keyboardRelease is not implemented" << std::endl;
+    INPUT input;
+    input.type = INPUT_KEYBOARD;
+    input.ki.wScan = 0;
+    input.ki.time = 0;
+    input.ki.dwExtraInfo = 0;
+    input.ki.wVk = key+0x41-'a';
+    input.ki.dwFlags = KEYEVENTF_KEYUP;
+    SendInput(1, &input, sizeof(INPUT));
 }
 
 void CPPBot::keyboard(const int key)
@@ -54,19 +81,33 @@ void CPPBot::keyboard(const int key)
 // └──────────────────────────────────────────────────────────────────┘
 void CPPBot::mousePosition(const int x, const int y)
 {
-    std::cout << "Sorry : CPPBot: mousePosition is not implemented" << std::endl;
+    INPUT input;
+    input.type = INPUT_MOUSE;
+    input.mi.mouseData=0;
+    input.mi.dx =  x*(65536.f/(screenWidthCached-1));
+    input.mi.dy =  y*(65536.f/(screenHeightCached-1));
+    input.mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+    SendInput(1,&input,sizeof(input));
 }
 void CPPBot::mouseGetPosition(int& x, int& y)
 {
-    std::cout << "Sorry : CPPBot: mouseGet is not implemented" << std::endl;
+    std::cout << "Sorry : CPPBot: mousePress is not implemented" << std::endl;
 }
 void CPPBot::mousePress(const int button)
 {
-    std::cout << "Sorry : CPPBot: mousePress is not implemented" << std::endl;
+    INPUT input;
+    input.type = INPUT_MOUSE;
+    input.mi.time = 0;
+    input.mi.dwFlags = mouseButtonDown[button];
+    SendInput(1,&input,sizeof(input));
 }
 void CPPBot::mouseRelease(const int button)
 {
-    std::cout << "Sorry : CPPBot: mouseRelease is not implemented" << std::endl;
+    INPUT input;
+    input.type = INPUT_MOUSE;
+    input.mi.time = 0;
+    input.mi.dwFlags = mouseButtonUp[button];
+    SendInput(1,&input,sizeof(input));
 }
 void CPPBot::mouse(const int button)
 {
