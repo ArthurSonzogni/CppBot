@@ -7,13 +7,13 @@ project(test)
 
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  Linux Library                                                   |
+# │ Add dependency Library                                           |
 # └──────────────────────────────────────────────────────────────────┘
 if(UNIX)
     set(LIB_DIR lib/linux)
     find_package(X11 REQUIRED)
-    set(NEEDED_LIBS     "${NEEDED_LIBS}${X11_LIBRARIES}"  )
-    set(NEEDED_INCLUDES "${NEEDED_INCLUDES} ${X11_INCLUDE_DIR}")
+    set(NEEDED_LIBS     "${NEEDED_LIBS};${X11_LIBRARIES}"  )
+    set(NEEDED_INCLUDES "${NEEDED_INCLUDES};${X11_INCLUDE_DIR}")
 elseif(WIN32)
     set(LIB_DIR lib/windows)
 elseif(APPLE)
@@ -43,16 +43,6 @@ INSTALL(FILES include/CPPBot
 # └──────────────────────────────────────────────────────────────────┘
 
 include_directories(include)
-add_executable(test test/test.cpp)
-target_link_libraries (test LINK_PUBLIC CPPBot ${NEEDED_LIBS})
+add_executable(testCppBot test/main.cpp)
+target_link_libraries (testCppBot LINK_PUBLIC CPPBot ${NEEDED_LIBS})
 include_directories(${NEEDED_INCLUDES})
-
-# ┌──────────────────────────────────────────────────────────────────┐
-# │  make run (command)                                              │ 
-# └──────────────────────────────────────────────────────────────────┘
-add_custom_target(run
-    COMMAND ./test
-    DEPENDS test
-    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
-)
-

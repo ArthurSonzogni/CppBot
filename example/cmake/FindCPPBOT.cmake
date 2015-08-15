@@ -8,20 +8,14 @@ find_path(CPPBOT_INCLUDE_DIR CPPBot)
 find_library(CPPBOT_LIBRARY NAMES CPPBot)
 
 
-set(CPPBOT_LIBRARIES ${CPPBOT_LIBRARY} )
-set(CPPBOT_INCLUDE_DIRS ${CPPBOT_INCLUDE_DIR} )
-    #set(CPPBOT_LIBRARIES"${CPPBOT_LIBRARIES} ${X11_LIBRARIES}"  )
-    #set(CPPBOT_INCLUDE_DIR "${CPPBOT_INCLUDE_DIR} ${X11_INCLUDE_DIR}")
-
 if(UNIX)
-    set(LIB_DIR lib/linux)
     find_package(X11 REQUIRED)
-    set(NEEDED_LIBS     "${NEEDED_LIBS} ${X11_LIBRARIES}"  )
-    set(NEEDED_INCLUDES "${NEEDED_INCLUDES} ${X11_INCLUDE_DIR}")
+    set(NEEDED_LIB     "${NEEDED_LIB};${X11_LIBRARIES}"  )
+    set(NEED_INC       "${NEED_INC};${X11_INCLUDE_DIR}")
 elseif(WIN32)
-    set(LIB_DIR lib/windows)
+    # Nothing until now
 elseif(APPLE)
-    set(LIB_DIR lib/macos)
+    # Nothing until now
 else()
     message(FATAL_ERROR "You system is not supported")
 endif()
@@ -30,6 +24,9 @@ include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set CPPBOT_FOUND to TRUE
 # if all listed variables are TRUE
 find_package_handle_standard_args(CPPBOT  DEFAULT_MSG
-    CPPBOT_LIBRARIES CPPBOT_INCLUDE_DIRS)
+    CPPBOT_LIBRARY CPPBOT_INCLUDE_DIR NEEDED_LIB NEED_INC)
+
+set(CPPBOT_LIBRARIES "${CPPBOT_LIBRARY};${NEEDED_LIB}")
+set(CPPBOT_INCLUDE_DIRS "${CPPBOT_INCLUDE_DIR};${NEED_INC}")
 
 mark_as_advanced(CPPBOT_INCLUDE_DIRS CPPBOT_LIBRARIES )
