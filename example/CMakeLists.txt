@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8.11)
 project(test)
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  Find the CPPBot library                                         |
+# │  Find the CPPBot library                                         │
 # └──────────────────────────────────────────────────────────────────┘
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 find_package(CPPBOT)

@@ -7,7 +7,7 @@ project(test)
 
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │ Add dependency Library                                           |
+# │ Add dependency Library                                           │
 # └──────────────────────────────────────────────────────────────────┘
 if(UNIX)
     set(LIB_DIR lib/linux)
@@ -27,7 +27,7 @@ add_library (CPPBot ${libs})
 target_include_directories(CPPBot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  Install library                                                 |
+# │  Install library                                                 │
 # └──────────────────────────────────────────────────────────────────┘
 
 INSTALL(TARGETS CPPBot
@@ -39,7 +39,7 @@ INSTALL(FILES include/CPPBot
 )
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  test                   
+# │  test                                                            │
 # └──────────────────────────────────────────────────────────────────┘
 
 include_directories(include)
