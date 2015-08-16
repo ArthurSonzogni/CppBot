@@ -7,17 +7,17 @@ project(test)
 
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │ Add dependency Library                                           |
+# │ Add dependency Library                                           │
 # └──────────────────────────────────────────────────────────────────┘
-if(UNIX)
+if(APPLE)
+    set(LIB_DIR lib/macos)
+elseif(WIN32)
+    set(LIB_DIR lib/windows)
+elseif(UNIX)
     set(LIB_DIR lib/linux)
     find_package(X11 REQUIRED)
     set(NEEDED_LIBS     "${NEEDED_LIBS};${X11_LIBRARIES}"  )
     set(NEEDED_INCLUDES "${NEEDED_INCLUDES};${X11_INCLUDE_DIR}")
-elseif(WIN32)
-    set(LIB_DIR lib/windows)
-elseif(APPLE)
-    set(LIB_DIR lib/macos)
 else()
     message(FATAL_ERROR "You system is not supported")
 endif()
@@ -27,7 +27,7 @@ add_library (CPPBot ${libs})
 target_include_directories(CPPBot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  Install library                                                 |
+# │  Install library                                                 │
 # └──────────────────────────────────────────────────────────────────┘
 
 INSTALL(TARGETS CPPBot
@@ -39,7 +39,7 @@ INSTALL(FILES include/CPPBot
 )
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  test                   
+# │  test                                                            │
 # └──────────────────────────────────────────────────────────────────┘
 
 include_directories(include)
