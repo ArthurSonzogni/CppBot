@@ -1,4 +1,5 @@
 #include "CPPBot"
+#include <iostream>
 
 CPPBot::CPPBot()
 {
